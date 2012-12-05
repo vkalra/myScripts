@@ -1,4 +1,4 @@
 myScripts
 =========
 
-Scripts to help me do common task on my machines
+Scripts to help me do common tasks on my machines
