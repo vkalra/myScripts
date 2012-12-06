@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# This script will shutdown multiple VM in a certain order
+# based on the .autoshutdown file located in /home/vkalra/scripts/vbox
+
+for vm in $(grep -v "^#" /home/vkalra/scripts/vbox/.autoshutdown)
+do
+vboxmanage controlvm $vm acpipowerbutton
+sleep 30 
+done;
