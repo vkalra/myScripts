@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# This script will startup multiple VM in a certain order
+# based on the .autostart file located in /home/vkalra/scripts/vbox
+
+for vm in $(grep -v "^#" /home/vkalra/scripts/vbox/.autostart)
+do
+vboxmanage startvm $vm --type gui
+sleep 60
+done;
