@@ -1,10 +1,117 @@
-#!/bin/sh
+#!/bin/bash
 
-# This script will startup multiple VM in a certain order
-# based on the .autostart file located in /home/vkalra/scripts/vbox
+# This script will startup multiple VMs in a certain order
+# based on the .autostart file located in /home/vkalra/bin
+# You can also start startup individual VMs using the UI name
+# Or you can start a group of VMs, e.g. DB|IDM|IAM
 
-for vm in $(grep -v "^#" /home/vkalra/scripts/vbox/.autostart)
-do
-vboxmanage startvm $vm --type gui
-sleep 60
-done;
+# Declare what you need
+declare -a vmUUID
+declare -a vmName
+declare -A vmAArr
+declare -A vmGrp
+
+# How long to wait between consecutive startups
+declare timeWait=60
+
+usage()
+{
+  echo "Usage: startVMs [ALL|DB|IDM|IAM|<Name of VM>]"
+  exit 1;
+}
+
+# Check that at least one argument was supplied
+[ -z "$1" ] && usage
+
+# Process the .autostart file and place into hash
+processVMString()
+{
+  IFS=$'\n'
+  # Parse the autostart file and get the vm name and the uuid store in an array
+  for line in $(grep -v "^#" /home/vkalra/scripts/vbox/.autostart)
+  do
+    #echo "DEBUG: line is : $line"
+    IFS=: vmArr=( $line )
+    vmName+=(${vmArr[0]})
+    vmUUID+=(${vmArr[1]})
+    vmAArr+=([${vmArr[0]}]=${vmArr[1]})
+    #echo "DEBUG: vm of 0 is |${vmArr[0]}| and vm of 1 is ${vmArr[1]} and vm of 2 is ${vmArr[2]}"
+    if [ ${vmArr[2]} == "DB" ]
+    then
+      vmGrp["DB"]+=${vmArr[1]}:
+    fi
+    if [ ${vmArr[2]} == "IDM" ]
+    then
+      vmGrp["IDM"]+=${vmArr[1]}:
+    fi
+    if [ ${vmArr[2]} == "IAM" ]
+    then
+      vmGrp["IAM"]+=${vmArr[1]}:
+    fi
+  done
+
+     #echo "DEBUG: The array is:"
+     #for i in ${vmGrp[@]}
+     #do
+     #echo "The value is $i"
+     #done
+  unset IFS
+}
+ # Is there an argument?
+if [ $# -eq 1 ]
+then
+  processVMString
+else
+  usage
+  exit
+fi
+
+case "$1" in
+'ALL') echo "Starting all VMs"
+       for vm in ${vmUUID[@]}
+       do
+         echo "Starting $vm"
+         vboxmanage startvm $vm --type gui
+         sleep $timeWait 
+       done
+;;
+'DB') echo "Starting the DB VMs ${vmGrp[DB]}"
+      IFS=:
+      vm=(${vmGrp[DB]})
+      for v in ${vm}
+      do
+        echo "Starting $v"
+        vboxmanage startvm "$v" --type gui
+        sleep $timeWait
+      done
+      unset IFS
+
+;;
+'IDM') echo "Starting the IDM VMs $vmGrp[IDM]"
+       IFS=:
+       vm=(${vmGrp[IDM]})
+       for v in ${vm}
+       do
+         echo "Starting $v"
+         vboxmanage startvm "$v" --type gui
+         sleep $timeWait
+       done
+       unset IFS
+
+;;
+'IAM') echo "Starting the IDM VMs $vmGrp[IAM]"
+       IFS=:
+       vm=(${vmGrp[IAM]})
+       for v in ${vm}
+       do
+         echo "Starting $v"
+         vboxmanage startvm "$v" --type gui
+         sleep $timeWait
+       done
+       unset IFS
+
+;;
+*) # This must be a named VM you are trying to start
+   vboxmanage startvm "$1" --type gui
+;;
+esac
