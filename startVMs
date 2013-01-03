@@ -14,14 +14,15 @@ declare -A vmGrp
 # How long to wait between consecutive startups
 declare timeWait=60
 
+# Default type is Headless mode
+declare type=headless
+
 usage()
 {
-  echo "Usage: startVMs [ALL|DB|IDM|IAM|<Name of VM>]"
+  echo "Usage: startVMs [ALL|DB|IDM|IAM|<Name of VM> gui|headless]"
   exit 1;
 }
 
-# Check that at least one argument was supplied
-[ -z "$1" ] && usage
 
 # Process the .autostart file and place into hash
 processVMString()
@@ -57,10 +58,22 @@ processVMString()
      #done
   unset IFS
 }
- # Is there an argument?
+
+# Is there at least one argument?
 if [ $# -eq 1 ]
 then
   processVMString
+elif [ $# -eq 2 ]
+then
+  # If there is a second argument, it must be gui or headless
+  if [ "$2" = "gui" -o "$2" = "headless" ] 
+  then 
+    type="$2"
+    processVMString
+  else
+    usage
+    exit
+  fi
 else
   usage
   exit
@@ -70,8 +83,8 @@ case "$1" in
 'ALL') echo "Starting all VMs"
        for vm in ${vmUUID[@]}
        do
-         echo "Starting $vm"
-         vboxmanage startvm $vm --type gui
+         echo "Starting $vm with $type"
+         vboxmanage startvm $vm --type $type 
          sleep $timeWait 
        done
 ;;
@@ -80,8 +93,8 @@ case "$1" in
       vm=(${vmGrp[DB]})
       for v in ${vm}
       do
-        echo "Starting $v"
-        vboxmanage startvm "$v" --type gui
+        echo "Starting $v with $type"
+        vboxmanage startvm "$v" --type $type 
         sleep $timeWait
       done
       unset IFS
@@ -92,8 +105,8 @@ case "$1" in
        vm=(${vmGrp[IDM]})
        for v in ${vm}
        do
-         echo "Starting $v"
-         vboxmanage startvm "$v" --type gui
+         echo "Starting $v with $type"
+         vboxmanage startvm "$v" --type $type
          sleep $timeWait
        done
        unset IFS
@@ -104,14 +117,15 @@ case "$1" in
        vm=(${vmGrp[IAM]})
        for v in ${vm}
        do
-         echo "Starting $v"
-         vboxmanage startvm "$v" --type gui
+         echo "Starting $v with $type"
+         vboxmanage startvm "$v" --type $type
          sleep $timeWait
        done
        unset IFS
 
 ;;
 *) # This must be a named VM you are trying to start
-   vboxmanage startvm "$1" --type gui
+   echo "Starting $1 with type $type"
+   vboxmanage startvm "$1" --type $type
 ;;
 esac
