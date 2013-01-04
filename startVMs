@@ -29,7 +29,7 @@ processVMString()
 {
   IFS=$'\n'
   # Parse the autostart file and get the vm name and the uuid store in an array
-  for line in $(grep -v "^#" /home/vkalra/scripts/vbox/.autostart)
+  for line in $(grep -v "^#" /home/vkalra/bin/.autostart)
   do
     #echo "DEBUG: line is : $line"
     IFS=: vmArr=( $line )
@@ -43,6 +43,7 @@ processVMString()
     fi
     if [ ${vmArr[2]} == "IDM" ]
     then
+      echo ${vmArr[1]}
       vmGrp["IDM"]+=${vmArr[1]}:
     fi
     if [ ${vmArr[2]} == "IAM" ]
@@ -51,11 +52,11 @@ processVMString()
     fi
   done
 
-     #echo "DEBUG: The array is:"
-     #for i in ${vmGrp[@]}
-     #do
-     #echo "The value is $i"
-     #done
+     echo "DEBUG: The array is:"
+     for i in ${vmGrp[IDM]}
+     do
+     echo "The value is $i"
+     done
   unset IFS
 }
 
@@ -90,7 +91,7 @@ case "$1" in
 ;;
 'DB') echo "Starting the DB VMs ${vmGrp[DB]}"
       IFS=:
-      vm=(${vmGrp[DB]})
+      vm=${vmGrp[DB]}
       for v in ${vm}
       do
         echo "Starting $v with $type"
@@ -102,7 +103,7 @@ case "$1" in
 ;;
 'IDM') echo "Starting the IDM VMs $vmGrp[IDM]"
        IFS=:
-       vm=(${vmGrp[IDM]})
+       vm=${vmGrp[IDM]}
        for v in ${vm}
        do
          echo "Starting $v with $type"
@@ -114,7 +115,7 @@ case "$1" in
 ;;
 'IAM') echo "Starting the IDM VMs $vmGrp[IAM]"
        IFS=:
-       vm=(${vmGrp[IAM]})
+       vm=${vmGrp[IAM]}
        for v in ${vm}
        do
          echo "Starting $v with $type"

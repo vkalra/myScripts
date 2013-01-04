@@ -28,7 +28,7 @@ processVMString()
 {
   IFS=$'\n'
   # Parse the autostart file and get the vm name and the uuid store in an array
-  for line in $(grep -v "^#" /home/vkalra/scripts/vbox/.autostart)
+  for line in $(grep -v "^#" /home/vkalra/bin/.autostart)
   do
     #echo "DEBUG: line is : $line"
     IFS=: vmArr=( $line )
@@ -77,7 +77,7 @@ case "$1" in
 ;;
 'DB') echo "Shutting down the DB VMs ${vmGrp[DB]}"
       IFS=:
-      vm=(${vmGrp[DB]})
+      vm=${vmGrp[DB]}
       for v in ${vm}
       do
         echo "Shutting down $v"
@@ -89,7 +89,7 @@ case "$1" in
 ;;
 'IDM') echo "Shutting down the IDM VMs $vmGrp[IDM]"
        IFS=:
-       vm=(${vmGrp[IDM]})
+       vm=${vmGrp[IDM]}
        for v in ${vm}
        do
          echo "Starting $v"
@@ -101,7 +101,7 @@ case "$1" in
 ;;
 'IAM') echo "Shutting down the IDM VMs $vmGrp[IAM]"
        IFS=:
-       vm=(${vmGrp[IAM]})
+       vm=${vmGrp[IAM]}
        for v in ${vm}
        do
          echo "Starting $v"

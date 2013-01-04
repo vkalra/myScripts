@@ -3,8 +3,10 @@
 # The third parameter is the grouping of VMs to start up DB|IDM|IAM. This
 # allow you to start up groups of servers if there are more than one. 
 # First the DB
-DB Clone:2dcbd959-4caa-4a52-8608-45ed2b47a6aa:DB
+DB Clone:210614d0-88da-44ea-bace-5ae35d2896b9:DB
 # Now the IDM cluster
-IDM Clone:1aace8b7-7e76-4ba2-a9a3-dbae3d342fff:IDM
+IDM1-Clone:ab609df3-287c-442f-879e-374a48dbdc7f:IDM
+IDM2-Clone:a24f2924-1b09-492e-9e9e-6cb3f03bd390:IDM
 # And finally the IAM cluster
-IAM Clone:05eb05b7-bf7c-484a-85ec-a89003cbaaf3:IAM
+IAM1-Clone:5130255a-0bbe-46c2-b1b0-b0565412a2db:IAM
+IAM2-Clone:bf40994f-5a2a-45f9-8ba4-fd791e8a4899:IAM
