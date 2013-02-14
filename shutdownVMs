@@ -16,7 +16,7 @@ declare timeWait=30
 
 usage()
 {
-  echo "Usage: shutdownVMs [ALL|DB|IDM|IAM|<Name of VM>]"
+  echo "Usage: shutdownVMs [ALL|DB|IDM|IAM|WEB<Name of VM>]"
   exit 1;
 }
 
@@ -48,6 +48,10 @@ processVMString()
     then
       vmGrp["IAM"]+=${vmArr[1]}:
     fi
+    if [ ${vmArr[2]} == "WEB" ]
+    then
+      vmGrp["WEB"]+=${vmArr[1]}:
+    fi
   done
 
      #echo "DEBUG: The array is:"
@@ -75,7 +79,7 @@ case "$1" in
          sleep $timeWait
        done
 ;;
-'DB') echo "Shutting down the DB VMs ${vmGrp[DB]}"
+'DB') echo "Shutting down VMs ${vmGrp[DB]}"
       IFS=:
       vm=${vmGrp[DB]}
       for v in ${vm}
@@ -87,24 +91,36 @@ case "$1" in
       unset IFS
 
 ;;
-'IDM') echo "Shutting down the IDM VMs $vmGrp[IDM]"
+'IDM') echo "Shutting down VMs $vmGrp[IDM]"
        IFS=:
        vm=${vmGrp[IDM]}
        for v in ${vm}
        do
-         echo "Starting $v"
+         echo "Shutting down $v"
          vboxmanage controlvm $v acpipowerbutton
          sleep $timeWait
        done
        unset IFS
 
 ;;
-'IAM') echo "Shutting down the IDM VMs $vmGrp[IAM]"
+'IAM') echo "Shutting down VMs $vmGrp[IAM]"
        IFS=:
        vm=${vmGrp[IAM]}
        for v in ${vm}
        do
-         echo "Starting $v"
+         echo "Shutting down $v"
+         vboxmanage controlvm $v acpipowerbutton
+         sleep $timeWait
+       done
+       unset IFS
+
+;;
+'WEB') echo "Shutting down VMs $vmGrp[WEB]"
+       IFS=:
+       vm=${vmGrp[WEB]}
+       for v in ${vm}
+       do
+         echo "Shutting down $v"
          vboxmanage controlvm $v acpipowerbutton
          sleep $timeWait
        done

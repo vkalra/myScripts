@@ -19,7 +19,7 @@ declare type=headless
 
 usage()
 {
-  echo "Usage: startVMs [ALL|DB|IDM|IAM|<Name of VM> gui|headless]"
+  echo "Usage: startVMs [ALL|DB|IDM|IAM|WEB|<Name of VM> gui|headless]"
   exit 1;
 }
 
@@ -49,6 +49,10 @@ processVMString()
     if [ ${vmArr[2]} == "IAM" ]
     then
       vmGrp["IAM"]+=${vmArr[1]}:
+    fi
+    if [ ${vmArr[2]} == "WEB" ]
+    then
+      vmGrp["WEB"]+=${vmArr[1]}:
     fi
   done
 
@@ -89,7 +93,7 @@ case "$1" in
          sleep $timeWait 
        done
 ;;
-'DB') echo "Starting the DB VMs ${vmGrp[DB]}"
+'DB') echo "Starting VMs ${vmGrp[DB]}"
       IFS=:
       vm=${vmGrp[DB]}
       for v in ${vm}
@@ -101,7 +105,7 @@ case "$1" in
       unset IFS
 
 ;;
-'IDM') echo "Starting the IDM VMs $vmGrp[IDM]"
+'IDM') echo "Starting VMs $vmGrp[IDM]"
        IFS=:
        vm=${vmGrp[IDM]}
        for v in ${vm}
@@ -113,9 +117,21 @@ case "$1" in
        unset IFS
 
 ;;
-'IAM') echo "Starting the IDM VMs $vmGrp[IAM]"
+'IAM') echo "Starting VMs $vmGrp[IAM]"
        IFS=:
        vm=${vmGrp[IAM]}
+       for v in ${vm}
+       do
+         echo "Starting $v with $type"
+         vboxmanage startvm "$v" --type $type
+         sleep $timeWait
+       done
+       unset IFS
+
+;;
+'WEB') echo "Starting VMs $vmGrp[WEB]"
+       IFS=:
+       vm=${vmGrp[WEB]}
        for v in ${vm}
        do
          echo "Starting $v with $type"
